@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>ch.cern.eam</groupId>
 			<artifactId>eam-wshub-proxyclient</artifactId>
-			<version>11.4-4</version>
+			<version>11.4.1-5</version>
 		</dependency>
 	</dependencies>
 
@@ -203,4 +203,11 @@
 		</profile>
 	</profiles>
 
+	<repositories>
+		<repository>
+			<id>JMC-Local-Repo</id>
+			<name>James Local Repo</name>
+			<url>file:///home/ec2-user/maven_repository</url>
+		</repository>
+	</repositories>
 </project>
