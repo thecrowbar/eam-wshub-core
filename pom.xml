@@ -109,6 +109,18 @@
 		<url>https://github.com/cern-eam/eam-wshub-core</url>
 	</scm>
 
+	<repositories>
+		<repository>
+			<id>advoco-visualstudio-com-advoco-advoco</id>
+			<url>https://advoco.pkgs.visualstudio.com/_packaging/Advoco/maven/v1</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 	<distributionManagement>
 		<repository>
 			<id>advoco-visualstudio-com-advoco-advoco</id>
