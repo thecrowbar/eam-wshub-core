@@ -111,13 +111,15 @@
 
 	<distributionManagement>
 		<repository>
-			<id>eis</id>
-			<url>https://edmstools.cern.ch/nexus/content/repositories/ase-eds-releases</url>
+			<id>advoco-visualstudio-com-advoco-advoco</id>
+			<url>https://advoco.pkgs.visualstudio.com/_packaging/Advoco/maven/v1</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
-		<snapshotRepository>
-			<id>eis</id>
-			<url>https://edmstools.cern.ch/nexus/content/repositories/ase-eds-snapshots</url>
-		</snapshotRepository>
 	</distributionManagement>
 
 	<build>
@@ -202,12 +204,4 @@
 			</build>
 		</profile>
 	</profiles>
-
-	<repositories>
-		<repository>
-			<id>JMC-Local-Repo</id>
-			<name>James Local Repo</name>
-			<url>file:///home/ec2-user/maven_repository</url>
-		</repository>
-	</repositories>
 </project>
