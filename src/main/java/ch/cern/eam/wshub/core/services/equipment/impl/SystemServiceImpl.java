@@ -44,10 +44,10 @@ public class SystemServiceImpl implements SystemService {
 		if (context.getCredentials() != null)
 			getAssetResult = inforws.getSystemEquipmentOp(getSystem, "*",
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		else {
 			getAssetResult = inforws.getSystemEquipmentOp(getSystem, "*", null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 
 		SystemEquipment systemEquipment = getAssetResult.getResultData().getSystemEquipment();
@@ -120,10 +120,10 @@ public class SystemServiceImpl implements SystemService {
 		if (context.getCredentials() != null)
 			gethresult = inforws.getSystemParentHierarchyOp(getsystemh, "*",
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		else {
 			gethresult = inforws.getSystemParentHierarchyOp(getsystemh, "*", null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 		// System parent hierarchy
 		systemEquipment.setSystemParentHierarchy(gethresult.getResultData().getSystemParentHierarchy());
@@ -183,20 +183,18 @@ public class SystemServiceImpl implements SystemService {
 		if (context.getCredentials() != null)
 			getAssetResult = inforws.getSystemEquipmentOp(getSystem, "*",
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		else {
 			getAssetResult = inforws.getSystemEquipmentOp(getSystem, "*", null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 
 		systemEquipment = getAssetResult.getResultData().getSystemEquipment();
 		//
-		//
-		//
 		if (systemParam.getClassCode() != null && (systemEquipment.getCLASSID() == null
 				|| !systemParam.getClassCode().toUpperCase().equals(systemEquipment.getCLASSID().getCLASSCODE()))) {
 			systemEquipment.setUSERDEFINEDAREA(
-					tools.getCustomFieldsTools().getCustomFields(context, "OBJ", systemParam.getClassCode().toUpperCase()));
+					tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", systemParam.getClassCode().toUpperCase()));
 		}
 
 		initializeSystemObject(systemEquipment, systemParam, context);
@@ -206,10 +204,10 @@ public class SystemServiceImpl implements SystemService {
 		if (context.getCredentials() != null) {
 			inforws.syncSystemEquipmentOp(syncPosition, "*",
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			inforws.syncSystemEquipmentOp(syncPosition, "*", null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 		//TODO: Update CERN properties
 		//equipmentOther.updateEquipmentCERNProperties(systemParam);
@@ -220,26 +218,18 @@ public class SystemServiceImpl implements SystemService {
 
 		SystemEquipment systemEquipment = new SystemEquipment();
 		//
-		//
-		//
 		if (systemParam.getCustomFields() != null && systemParam.getCustomFields().length > 0) {
 			if (systemParam.getClassCode() != null && !systemParam.getClassCode().trim().equals("")) {
 				systemEquipment.setUSERDEFINEDAREA(
-						tools.getCustomFieldsTools().getCustomFields(context, "OBJ", systemParam.getClassCode()));
+						tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", systemParam.getClassCode()));
 			} else {
-				systemEquipment.setUSERDEFINEDAREA(tools.getCustomFieldsTools().getCustomFields(context, "OBJ", "*"));
+				systemEquipment.setUSERDEFINEDAREA(tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", "*"));
 			}
 		}
 		//
-		//
-		//
 		systemEquipment.setUserDefinedFields(new UserDefinedFields());
 		//
-		//
-		//
 		initializeSystemObject(systemEquipment, systemParam, context);
-		//
-		//
 		//
 		MP0311_AddSystemEquipment_001 addPosition = new MP0311_AddSystemEquipment_001();
 		addPosition.setSystemEquipment(systemEquipment);
@@ -247,13 +237,11 @@ public class SystemServiceImpl implements SystemService {
 		if (context.getCredentials() != null) {
 			result = inforws.addSystemEquipmentOp(addPosition, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			result = inforws.addSystemEquipmentOp(addPosition, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
-		//TODO Update CERN properties
-		//equipmentOther.updateEquipmentCERNProperties(systemParam);
 		return result.getResultData().getSYSTEMID().getEQUIPMENTCODE();
 	}
 
@@ -267,10 +255,10 @@ public class SystemServiceImpl implements SystemService {
 		if (context.getCredentials() != null) {
 			inforws.deleteSystemEquipmentOp(deleteSystem, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			inforws.deleteSystemEquipmentOp(deleteSystem, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 
 		return systemCode;
@@ -294,9 +282,6 @@ public class SystemServiceImpl implements SystemService {
 		if (systemParam.getTypeCode() != null) {
 			systemInfor.setTYPE(new TYPE_Type());
 			systemInfor.getTYPE().setTYPECODE(systemParam.getTypeCode());
-		} else {
-			systemInfor.setTYPE(new TYPE_Type());
-			systemInfor.getTYPE().setTYPECODE("S");
 		}
 
 		if (systemParam.getStatusCode() != null) {

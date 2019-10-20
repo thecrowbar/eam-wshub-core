@@ -41,29 +41,18 @@ public class PositionServiceImpl implements PositionService {
 
 		PositionEquipment positionEquipment = new PositionEquipment();
 		//
-		//
-		//
 		if (positionParam.getCustomFields() != null && positionParam.getCustomFields().length > 0) {
 			if (positionParam.getClassCode() != null && !positionParam.getClassCode().trim().equals("")) {
 				positionEquipment.setUSERDEFINEDAREA(
-						tools.getCustomFieldsTools().getCustomFields(context, "OBJ", positionParam.getClassCode()));
+						tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", positionParam.getClassCode()));
 			} else {
-				positionEquipment.setUSERDEFINEDAREA(tools.getCustomFieldsTools().getCustomFields(context, "OBJ", "*"));
+				positionEquipment.setUSERDEFINEDAREA(tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", "*"));
 			}
 		}
 		//
-		//
-		//
 		positionEquipment.setUserDefinedFields(new net.datastream.schemas.mp_entities.positionequipment_001.UserDefinedFields());
 		//
-		//
-		//
 		initializePositionObject(context, positionEquipment, positionParam, true);
-
-		positionEquipment.setTYPE(new TYPE_Type());
-		positionEquipment.getTYPE().setTYPECODE("P");
-		//
-		//
 		//
 		MP0306_AddPositionEquipment_001 addPosition = new MP0306_AddPositionEquipment_001();
 		addPosition.setPositionEquipment(positionEquipment);
@@ -72,10 +61,10 @@ public class PositionServiceImpl implements PositionService {
 		if (context.getCredentials() != null) {
 			result = inforws.addPositionEquipmentOp(addPosition, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			result = inforws.addPositionEquipmentOp(addPosition, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 		//TODO Update CERN properties
 		//equipmentOther.updateEquipmentCERNProperties(positionParam);
@@ -92,10 +81,10 @@ public class PositionServiceImpl implements PositionService {
 		if (context.getCredentials() != null) {
 			inforws.deletePositionEquipmentOp(deletePosition, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			inforws.deletePositionEquipmentOp(deletePosition, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 
 		return positionCode;
@@ -112,10 +101,10 @@ public class PositionServiceImpl implements PositionService {
 		if (context.getCredentials() != null) {
 			result = inforws.getPositionParentHierarchyOp(getpositionph, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			result = inforws.getPositionParentHierarchyOp(getpositionph, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 
 		return result.getResultData().getPositionParentHierarchy();
@@ -132,11 +121,11 @@ public class PositionServiceImpl implements PositionService {
 		if (context.getCredentials() != null) {
 			getPositionResult = inforws.getPositionEquipmentOp(getPosition, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			getPositionResult = inforws.getPositionEquipmentOp(getPosition, tools.getOrganizationCode(context), null,
 					null, new Holder<SessionType>(tools.createInforSession(context)), null,
-					applicationData.getTenant());
+					tools.getTenant(context));
 		}
 		PositionEquipment positionEquipment = getPositionResult.getResultData().getPositionEquipment();
 
@@ -157,7 +146,7 @@ public class PositionServiceImpl implements PositionService {
 			position.setStatusDesc(positionEquipment.getSTATUS().getDESCRIPTION());
 		}
 
-		//
+		// TYPE
 		if (positionEquipment.getTYPE() != null) {
 			position.setTypeCode(positionEquipment.getTYPE().getTYPECODE());
 			position.setTypeDesc(positionEquipment.getTYPE().getDESCRIPTION());
@@ -402,10 +391,10 @@ public class PositionServiceImpl implements PositionService {
 		if (context.getCredentials() != null) {
 			getAssetResult = inforws.getPositionEquipmentOp(getPosition, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			getAssetResult = inforws.getPositionEquipmentOp(getPosition, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 		return getAssetResult.getResultData().getPositionEquipment();
 
@@ -420,7 +409,7 @@ public class PositionServiceImpl implements PositionService {
 		if (positionParam.getClassCode() != null && (positionEquipment.getCLASSID() == null
 				|| !positionParam.getClassCode().toUpperCase().equals(positionEquipment.getCLASSID().getCLASSCODE()))) {
 			positionEquipment.setUSERDEFINEDAREA(
-					tools.getCustomFieldsTools().getCustomFields(context, "OBJ", positionParam.getClassCode().toUpperCase()));
+					tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", positionParam.getClassCode().toUpperCase()));
 		}
 		// Update 'positionEquipment' with supplied values
 		initializePositionObject(context, positionEquipment, positionParam, false);
@@ -430,10 +419,10 @@ public class PositionServiceImpl implements PositionService {
 		if (context.getCredentials() != null) {
 			inforws.syncPositionEquipmentOp(syncPosition, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			inforws.syncPositionEquipmentOp(syncPosition, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 		//TODO Update CERN properties
 		//equipmentOther.updateEquipmentCERNProperties(positionParam);

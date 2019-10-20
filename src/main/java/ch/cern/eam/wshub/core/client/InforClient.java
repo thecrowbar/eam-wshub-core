@@ -2,7 +2,9 @@ package ch.cern.eam.wshub.core.client;
 
 import ch.cern.eam.wshub.core.interceptors.InforInterceptor;
 import ch.cern.eam.wshub.core.interceptors.InforInvocationHandler;
+import ch.cern.eam.wshub.core.services.administration.DataspyService;
 import ch.cern.eam.wshub.core.services.administration.UserSetupService;
+import ch.cern.eam.wshub.core.services.administration.impl.DataspyServiceImpl;
 import ch.cern.eam.wshub.core.services.administration.impl.UserSetupServiceImpl;
 import ch.cern.eam.wshub.core.services.comments.CommentService;
 import ch.cern.eam.wshub.core.services.comments.impl.CommentServiceImpl;
@@ -59,6 +61,7 @@ public class InforClient implements Serializable {
     private Tools tools;
     private InvocationHandler invocationHandler;
     private InforWebServicesPT inforWebServicesToolkitClient;
+    private BindingProvider bindingProvider;
 
     private CommentService commentService;
     private WorkOrderService workOrderService;
@@ -95,6 +98,7 @@ public class InforClient implements Serializable {
     private UserSetupService userSetupService;
     private GridsService gridsService;
     private DocumentsService documentsService;
+    private DataspyService dataspyService;
 
     private EquipmentGenerationService equipmentGenerationService;
     private EquipmentConfigurationService equipmentConfigurationService;
@@ -113,9 +117,13 @@ public class InforClient implements Serializable {
         private EntityManagerFactory entityManagerFactory;
         private Logger logger;
 
-        public Builder(String url, String tenant) {
+        public Builder(String url) {
             this.url = url;
-            this.tenant = tenant;
+        }
+
+        public Builder withDefaultTenant(String defaultTenant) {
+            this.tenant = defaultTenant;
+            return this;
         }
 
         public Builder withDefaultOrganizationCode(String defaultOrganizationCode) {
@@ -171,8 +179,11 @@ public class InforClient implements Serializable {
             if (this.soapHandlerResolver != null) {
                 service.setHandlerResolver(soapHandlerResolver);
             }
+
             InforWebServicesPT inforWebServicesToolkitClient = service.getPort(InforWebServicesPT.class);
-            ((BindingProvider) inforWebServicesToolkitClient).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, applicationData.getUrl());
+            inforClient.bindingProvider = (BindingProvider) inforWebServicesToolkitClient;
+            inforClient.bindingProvider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, applicationData.getUrl());
+            inforClient.bindingProvider.getRequestContext().put("set-jaxb-validation-event-handler", false);
 
             if (this.executorService != null) {
                 // Init new Executor Service
@@ -223,6 +234,7 @@ public class InforClient implements Serializable {
             inforClient.pickTicketService = proxy(PickTicketService.class, new PickTicketServiceImpl(applicationData, tools, inforWebServicesToolkitClient), inforInterceptor, tools);
             inforClient.equipmentGenerationService = proxy(EquipmentGenerationService.class, new EquipmentGenerationServiceImpl(applicationData, tools, inforWebServicesToolkitClient),inforInterceptor, tools);
             inforClient.equipmentConfigurationService = proxy(EquipmentConfigurationService.class, new EquipmentConfigurationServiceImpl(applicationData, tools, inforWebServicesToolkitClient),inforInterceptor, tools);
+            inforClient.dataspyService = proxy(DataspyService.class, new DataspyServiceImpl(applicationData, tools, inforWebServicesToolkitClient),inforInterceptor, tools);
 
             inforClient.inforWebServicesToolkitClient = inforWebServicesToolkitClient;
             return inforClient;
@@ -360,4 +372,9 @@ public class InforClient implements Serializable {
     public EquipmentConfigurationService getEquipmentConfigurationService() {
         return equipmentConfigurationService;
     }
+
+    public DataspyService getDataspyService() { return dataspyService; }
+
+    public BindingProvider getBindingProvider() { return bindingProvider; }
+
 }

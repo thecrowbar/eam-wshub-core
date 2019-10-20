@@ -17,10 +17,12 @@ import net.datastream.schemas.mp_functions.SessionType;
 import net.datastream.schemas.mp_functions.mp0035_001.MP0035_GetActivity_001;
 import net.datastream.schemas.mp_functions.mp0037_001.MP0037_AddActivity_001;
 import net.datastream.schemas.mp_functions.mp0038_001.MP0038_SyncActivity_001;
+import net.datastream.schemas.mp_functions.mp0039_001.MP0039_DeleteActivity_001;
 import net.datastream.schemas.mp_functions.mp0042_001.MP0042_AddLaborBooking_001;
 import net.datastream.schemas.mp_results.mp0035_001.MP0035_GetActivity_001_Result;
 import net.datastream.schemas.mp_results.mp0037_001.MP0037_AddActivity_001_Result;
 import net.datastream.schemas.mp_results.mp0038_001.MP0038_SyncActivity_001_Result;
+import net.datastream.schemas.mp_results.mp0039_001.MP0039_DeleteActivity_001_Result;
 import net.datastream.schemas.mp_results.mp0042_001.MP0042_AddLaborBooking_001_Result;
 import net.datastream.wsdls.inforws.InforWebServicesPT;
 
@@ -131,9 +133,9 @@ public class LaborBookingServiceImpl implements LaborBookingService {
 		MP0042_AddLaborBooking_001_Result result = null;
 
 		if (context.getCredentials() != null) {
-			result = inforws.addLaborBookingOp(addLaborBoking, tools.getOrganizationCode(context), tools.createSecurityHeader(context),"TERMINATE", null, tools.createMessageConfig(), applicationData.getTenant());
+			result = inforws.addLaborBookingOp(addLaborBoking, tools.getOrganizationCode(context), tools.createSecurityHeader(context),"TERMINATE", null, tools.createMessageConfig(), tools.getTenant(context));
 		} else {
-			result = inforws.addLaborBookingOp(addLaborBoking, tools.getOrganizationCode(context), null, null, new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), applicationData.getTenant());
+			result = inforws.addLaborBookingOp(addLaborBoking, tools.getOrganizationCode(context), null, null, new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), tools.getTenant(context));
 		}
 		return laborBookingParam.getActivityCode();
 	}
@@ -142,7 +144,7 @@ public class LaborBookingServiceImpl implements LaborBookingService {
 	public Activity[] readActivities(InforContext context, String workOrderNumber, Boolean includeChecklists) throws InforException {
 		try {
 			GridRequest gridRequest = new GridRequest("WSJOBS_ACT");
-			gridRequest.setRowCount("1000");
+			gridRequest.setRowCount(1000);
 			gridRequest.setUserFunctionName("WSJOBS");
 			gridRequest.getParams().put("param.jobnum", workOrderNumber);
 
@@ -232,6 +234,7 @@ public class LaborBookingServiceImpl implements LaborBookingService {
 			activityInfor.getTASKSID().setORGANIZATIONID(tools.getOrganization(context));
 			activityInfor.getTASKSID().setTASKCODE(activityParam.getTaskCode());
 			activityInfor.getTASKSID().setTASKREVISION((long) 0);
+			activityInfor.getTASKSID().setTASKQUANTITY(tools.getDataTypeTools().encodeQuantity(activityParam.getTaskQty(), "Task Quantity"));
 		}
 
 		//
@@ -239,6 +242,8 @@ public class LaborBookingServiceImpl implements LaborBookingService {
 			activityInfor.setMATLIST(new MATLIST_Type());
 			activityInfor.getMATLIST().setMTLCODE(activityParam.getMaterialList());
 		}
+
+
 
 		// NOTE
 		if (tools.getDataTypeTools().isNotEmpty(activityParam.getActivityNote())) {
@@ -256,10 +261,10 @@ public class LaborBookingServiceImpl implements LaborBookingService {
 		if (context.getCredentials() != null) {
 			result = inforws.addActivityOp(addActivity, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					tools.createMessageConfig(), applicationData.getTenant());
+					tools.createMessageConfig(), tools.getTenant(context));
 		} else {
 			result = inforws.addActivityOp(addActivity, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), tools.getTenant(context));
 		}
 		return result.getResultData().getACTIVITYID().getACTIVITYCODE().getValue() + "";
 	}
@@ -286,10 +291,10 @@ public class LaborBookingServiceImpl implements LaborBookingService {
 		if (context.getCredentials() != null) {
 			getresult = inforws.getActivityOp(getActivity, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					tools.createMessageConfig(), applicationData.getTenant());
+					tools.createMessageConfig(), tools.getTenant(context));
 		} else {
 			getresult = inforws.getActivityOp(getActivity, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), tools.getTenant(context));
 		}
 
 		net.datastream.schemas.mp_entities.activity_001.Activity activityInfor = getresult.getResultData().getActivity();
@@ -335,6 +340,7 @@ public class LaborBookingServiceImpl implements LaborBookingService {
 				activityInfor.getTASKSID().setTASKREVISION((long) 0);
 			}
 			activityInfor.getTASKSID().setTASKCODE(activityParam.getTaskCode());
+			activityInfor.getTASKSID().setTASKQUANTITY(tools.getDataTypeTools().encodeQuantity(activityParam.getTaskQty(), "Task Quantity"));
 		}
 
 		//
@@ -363,12 +369,38 @@ public class LaborBookingServiceImpl implements LaborBookingService {
 		if (context.getCredentials() != null) {
 			syncresult = inforws.syncActivityOp(syncActivity, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					tools.createMessageConfig(), applicationData.getTenant());
+					tools.createMessageConfig(), tools.getTenant(context));
 		} else {
 			syncresult = inforws.syncActivityOp(syncActivity, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), tools.getTenant(context));
 		}
 		return syncresult.getResultData().getACTIVITYID().getACTIVITYCODE().getValue() + "";
+	}
+
+	public String deleteActivity(InforContext context, Activity activityParam) throws InforException {
+		//
+		// CALL THE WS
+		//
+		MP0039_DeleteActivity_001 deleteActivity = new MP0039_DeleteActivity_001();
+		deleteActivity.setACTIVITYID(new ACTIVITYID());
+		deleteActivity.getACTIVITYID().setACTIVITYCODE(new ACTIVITYCODE());
+		deleteActivity.getACTIVITYID().getACTIVITYCODE().setValue(tools.getDataTypeTools().encodeLong(activityParam.getActivityCode(), "Activity Code"));
+		deleteActivity.getACTIVITYID().setWORKORDERID(new WOID_Type());
+		deleteActivity.getACTIVITYID().getWORKORDERID().setORGANIZATIONID(tools.getOrganization(context));
+		deleteActivity.getACTIVITYID().getWORKORDERID().setJOBNUM(activityParam.getWorkOrderNumber());
+		deleteActivity.setConfirmdeletechecklist("true");
+
+		MP0039_DeleteActivity_001_Result result = null;
+
+		if (context.getCredentials() != null) {
+			result = inforws.deleteActivityOp(deleteActivity, tools.getOrganizationCode(context),
+					tools.createSecurityHeader(context), "TERMINATE", null,
+					tools.createMessageConfig(), tools.getTenant(context));
+		} else {
+			result = inforws.deleteActivityOp(deleteActivity, tools.getOrganizationCode(context), null, null,
+					new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), tools.getTenant(context));
+		}
+		return result.getResultData().getACTIVITYID().getACTIVITYCODE().getValue() + "";
 	}
 
 

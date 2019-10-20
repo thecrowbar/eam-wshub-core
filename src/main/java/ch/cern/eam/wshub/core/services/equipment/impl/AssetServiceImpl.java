@@ -326,10 +326,10 @@ public class AssetServiceImpl implements AssetService {
         if (context.getCredentials() != null) {
             result = inforws.getAssetParentHierarchyOp(getassetph, tools.getOrganizationCode(context),
                     tools.createSecurityHeader(context), "TERMINATE", null,
-                    null, applicationData.getTenant());
+                    null, tools.getTenant(context));
         } else {
             result = inforws.getAssetParentHierarchyOp(getassetph, tools.getOrganizationCode(context), null, null,
-                    new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+                    new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
         }
 
         return result.getResultData().getAssetParentHierarchy();
@@ -348,13 +348,13 @@ public class AssetServiceImpl implements AssetService {
             getAssetResult = inforws.getAssetEquipmentOp(getAsset,
                     tools.getOrganizationCode(context),
                     tools.createSecurityHeader(context), "TERMINATE", null,
-                    tools.createMessageConfig(), applicationData.getTenant());
+                    tools.createMessageConfig(), tools.getTenant(context));
         } else {
             getAssetResult = inforws.getAssetEquipmentOp(getAsset,
                     tools.getOrganizationCode(context), null, null,
                     new Holder<SessionType>(tools.createInforSession(context)),
                     tools.createMessageConfig(),
-                    applicationData.getTenant());
+                    tools.getTenant(context));
         }
         return getAssetResult.getResultData().getAssetEquipment();
 
@@ -367,10 +367,10 @@ public class AssetServiceImpl implements AssetService {
         if (context.getCredentials() != null) {
             inforws.syncAssetEquipmentOp(syncAsset, tools.getOrganizationCode(context),
                     tools.createSecurityHeader(context), "TERMINATE", null,
-                    tools.createMessageConfig(), applicationData.getTenant());
+                    tools.createMessageConfig(), tools.getTenant(context));
         } else {
             inforws.syncAssetEquipmentOp(syncAsset, tools.getOrganizationCode(context), null, null,
-                    new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), applicationData.getTenant());
+                    new Holder<SessionType>(tools.createInforSession(context)), tools.createMessageConfig(), tools.getTenant(context));
         }
     }
 
@@ -382,7 +382,7 @@ public class AssetServiceImpl implements AssetService {
         if (assetParam.getClassCode() != null && (assetEquipment.getCLASSID() == null
                 || !assetParam.getClassCode().toUpperCase().equals(assetEquipment.getCLASSID().getCLASSCODE()))) {
             assetEquipment.setUSERDEFINEDAREA(
-                    tools.getCustomFieldsTools().getCustomFields(context, "OBJ", assetParam.getClassCode().toUpperCase()));
+                    tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", assetParam.getClassCode().toUpperCase()));
         }
         //
         //
@@ -401,29 +401,18 @@ public class AssetServiceImpl implements AssetService {
 
         AssetEquipment assetEquipment = new AssetEquipment();
         //
-        //
-        //
         if (assetParam.getCustomFields() != null && assetParam.getCustomFields().length > 0) {
             if (assetParam.getClassCode() != null && !assetParam.getClassCode().trim().equals("")) {
                 assetEquipment.setUSERDEFINEDAREA(
-                        tools.getCustomFieldsTools().getCustomFields(context, "OBJ", assetParam.getClassCode()));
+                        tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", assetParam.getClassCode()));
             } else {
-                assetEquipment.setUSERDEFINEDAREA(tools.getCustomFieldsTools().getCustomFields(context, "OBJ", "*"));
+                assetEquipment.setUSERDEFINEDAREA(tools.getCustomFieldsTools().getInforCustomFields(context, "OBJ", "*"));
             }
         }
         //
-        //
-        //
         assetEquipment.setUserDefinedFields(new UserDefinedFields());
         //
-        //
-        //
         initializeAssetObject(assetEquipment, assetParam, context);
-
-        assetEquipment.setTYPE(new TYPE_Type());
-        assetEquipment.getTYPE().setTYPECODE("A");
-        //
-        //
         //
         MP0301_AddAssetEquipment_001 addAsset = new MP0301_AddAssetEquipment_001();
         addAsset.setAssetEquipment(assetEquipment);
@@ -432,10 +421,10 @@ public class AssetServiceImpl implements AssetService {
         if (context.getCredentials() != null) {
             addAssetResult = inforws.addAssetEquipmentOp(addAsset, tools.getOrganizationCode(context),
                     tools.createSecurityHeader(context), "TERMINATE", null,
-                    null, applicationData.getTenant());
+                    null, tools.getTenant(context));
         } else {
             addAssetResult = inforws.addAssetEquipmentOp(addAsset, tools.getOrganizationCode(context), null, null,
-                    new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+                    new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
         }
         //TODO Update CERN properties
         //equipmentOther.updateEquipmentCERNProperties(assetParam);
@@ -451,10 +440,10 @@ public class AssetServiceImpl implements AssetService {
         if (context.getCredentials() != null) {
             inforws.deleteAssetEquipmentOp(deleteAsset, tools.getOrganizationCode(context),
                     tools.createSecurityHeader(context), "TERMINATE", null,
-                    null, applicationData.getTenant());
+                    null, tools.getTenant(context));
         } else {
             inforws.deleteAssetEquipmentOp(deleteAsset, tools.getOrganizationCode(context), null, null,
-                    new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+                    new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
         }
         return assetCode;
     }
@@ -478,6 +467,11 @@ public class AssetServiceImpl implements AssetService {
         if (assetParam.getStatusCode() != null) {
             assetInfor.setSTATUS(new STATUS_Type());
             assetInfor.getSTATUS().setSTATUSCODE(assetParam.getStatusCode().toUpperCase().trim());
+        }
+
+        if (assetParam.getTypeCode() != null) {
+            assetInfor.setTYPE(new TYPE_Type());
+            assetInfor.getTYPE().setTYPECODE(assetParam.getTypeCode());
         }
 
         if (assetParam.getClassCode() != null) {

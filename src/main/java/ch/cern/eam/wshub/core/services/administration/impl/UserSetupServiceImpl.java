@@ -46,7 +46,7 @@ public class UserSetupServiceImpl implements UserSetupService {
 			Holder<SessionType> sessionTypeHolder = new Holder<>();
 			MP9532_RunEmptyOp_001_Result result =  inforws.runEmptyOpOp(runEmptyOp, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "", sessionTypeHolder, null,
-					applicationData.getTenant());
+					tools.getTenant(context));
 			return sessionTypeHolder.value.getSessionId();
 		} else {
 			throw tools.generateFault("Please supply valid credentials");
@@ -65,11 +65,11 @@ public class UserSetupServiceImpl implements UserSetupService {
 		if (context.getCredentials() != null) {
 			getUserSetupResult = inforws.getUserSetupOp(getUserSetup, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 
 		} else {
 			getUserSetupResult = inforws.getUserSetupOp(getUserSetup, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 
 		net.datastream.schemas.mp_entities.usersetup_001.UserSetup userInfor = getUserSetupResult.getResultData()
@@ -151,9 +151,9 @@ public class UserSetupServiceImpl implements UserSetupService {
 		if (userParam.getCustomFields() != null && userParam.getCustomFields().length > 0) {
 			if (userParam.getClassCode() != null && !userParam.getClassCode().trim().equals("")) {
 				userInfor.setUSERDEFINEDAREA(
-						tools.getCustomFieldsTools().getCustomFields(context, "USER", userParam.getClassCode()));
+						tools.getCustomFieldsTools().getInforCustomFields(context, "USER", userParam.getClassCode()));
 			} else {
-				userInfor.setUSERDEFINEDAREA(tools.getCustomFieldsTools().getCustomFields(context, "USER", "*"));
+				userInfor.setUSERDEFINEDAREA(tools.getCustomFieldsTools().getInforCustomFields(context, "USER", "*"));
 			}
 		}
 
@@ -170,10 +170,10 @@ public class UserSetupServiceImpl implements UserSetupService {
 		if (context.getCredentials() != null) {
 			result = inforws.addUserSetupOp(addUser, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			result = inforws.addUserSetupOp(addUser, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 
 		// Return result of adding the user
@@ -193,11 +193,11 @@ public class UserSetupServiceImpl implements UserSetupService {
 		if (context.getCredentials() != null) {
 			getUserSetupResult = inforws.getUserSetupOp(getUserSetup, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 
 		} else {
 			getUserSetupResult = inforws.getUserSetupOp(getUserSetup, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 
 		// Assign the result
@@ -208,7 +208,7 @@ public class UserSetupServiceImpl implements UserSetupService {
 		if (userParam.getClassCode() != null && (userInfor.getCLASSID() == null
 				|| !userParam.getClassCode().toUpperCase().equals(userInfor.getCLASSID().getCLASSCODE()))) {
 			userInfor.setUSERDEFINEDAREA(
-					tools.getCustomFieldsTools().getCustomFields(context, "USER", userParam.getClassCode().toUpperCase()));
+					tools.getCustomFieldsTools().getInforCustomFields(context, "USER", userParam.getClassCode().toUpperCase()));
 		}
 		// Init object for update
 		initializeInforUserObject(userInfor, userParam, context);
@@ -222,10 +222,10 @@ public class UserSetupServiceImpl implements UserSetupService {
 		if (context.getCredentials() != null) {
 			result = inforws.syncUserSetupOp(syncUser, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			result = inforws.syncUserSetupOp(syncUser, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 		// Return the result of the update
 		return result.getUSERID().getUSERCODE();
@@ -239,10 +239,10 @@ public class UserSetupServiceImpl implements UserSetupService {
 		if (context.getCredentials() != null) {
 			inforws.deleteUserSetupOp(deleteUser, tools.getOrganizationCode(context),
 					tools.createSecurityHeader(context), "TERMINATE", null,
-					null, applicationData.getTenant());
+					null, tools.getTenant(context));
 		} else {
 			inforws.deleteUserSetupOp(deleteUser, tools.getOrganizationCode(context), null, null,
-					new Holder<SessionType>(tools.createInforSession(context)), null, applicationData.getTenant());
+					new Holder<SessionType>(tools.createInforSession(context)), null, tools.getTenant(context));
 		}
 		return "success";
 	}
